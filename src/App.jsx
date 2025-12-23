@@ -13,10 +13,12 @@ import Auth from "./components/Auth";
 
 function App() {
   const [session, setSession] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
+      setLoading(false);
     });
 
     const {
@@ -28,17 +30,29 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Not logged in → show nothing / auth page (already handled by you)
-  if (!session) {
-    return <Auth />;
+  // ⏳ While checking auth
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center text-sm">
+        Loading…
+      </div>
+    );
   }
 
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home session={session} />} />
-        <Route path="/profile" element={<Profile session={session} />} />
-        <Route path="*" element={<Navigate to="/" />} />
+        {/* Not logged in */}
+        {!session && <Route path="*" element={<Auth />} />}
+
+        {/* Logged in */}
+        {session && (
+          <>
+            <Route path="/" element={<Home session={session} />} />
+            <Route path="/profile" element={<Profile session={session} />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </>
+        )}
       </Routes>
     </Router>
   );
