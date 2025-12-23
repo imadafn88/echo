@@ -9,6 +9,7 @@ import { supabase } from "./supabaseClient";
 
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
+import Auth from "./components/Auth";
 
 function App() {
   const [session, setSession] = useState(null);
