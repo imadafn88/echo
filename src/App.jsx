@@ -28,7 +28,9 @@ function App() {
   }, []);
 
   // Not logged in → show nothing / auth page (already handled by you)
-  if (!session) return null;
+  if (!session) {
+    return <Auth />;
+  }
 
   return (
     <Router>
