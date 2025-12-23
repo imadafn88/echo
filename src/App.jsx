@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { supabase } from "./supabaseClient";
-import Auth from "./components/Auth";
-import { Button } from "./components/ui/Button";
+
+import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 
 function App() {
@@ -21,26 +27,17 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-  };
-
-  if (!session) {
-    return <Auth />;
-  }
-
-  if (session) {
-    return <Profile session={session} />;
-  }
+  // Not logged in → show nothing / auth page (already handled by you)
+  if (!session) return null;
 
   return (
-    <div>
-      <h1>Welcome</h1>
-      <p>{session.user.email}</p>
-
-      <input type="png" />
-      <Button onClick={handleLogout}>Sign Out</Button>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home session={session} />} />
+        <Route path="/profile" element={<Profile session={session} />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </Router>
   );
 }
 

@@ -1,11 +1,21 @@
+import Navbar from "../components/Navbar";
+
 import { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 
 export default function Profile({ session }) {
+  const [toast, setToast] = useState("");
+  const [visibility, setVisibility] = useState("public");
+
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [caption, setCaption] = useState("");
   const [posts, setPosts] = useState([]);
+
+  const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(""), 2500);
+  };
 
   // Fetch user posts
   const fetchPosts = async () => {
@@ -77,53 +87,109 @@ export default function Profile({ session }) {
       content_type: isVideo ? "video" : "image",
       media_url: data.publicUrl,
       caption,
+      visibility,
     });
+    showToast("Post published");
 
     setFile(null);
     setPreview(null);
     setCaption("");
-
+    setVisibility("public");
     fetchPosts();
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>Profile</h2>
+    <div className="max-w-xl mx-auto px-4 py-6 space-y-6">
+      <>
+        <Navbar />
+        <div className="max-w-xl mx-auto px-4 py-6 space-y-6">...</div>
+      </>
 
-      <input type="file" accept="image/*,video/*" onChange={handleFileChange} />
+      {toast && (
+        <div className="fixed bottom-6 right-6 border border-fg bg-bg px-4 py-2 text-sm">
+          {toast}
+        </div>
+      )}
+      <h2 className="text-lg font-medium">Profile</h2>
+
+      <input
+        type="file"
+        accept="image/*,video/*"
+        onChange={handleFileChange}
+        className="text-sm"
+      />
 
       {preview && (
-        <>
+        <div className="border border-border">
           {file.type.startsWith("video") ? (
-            <video src={preview} controls width="300" />
+            <video src={preview} controls className="w-full" />
           ) : (
-            <img src={preview} width="300" />
+            <img src={preview} className="w-full" />
           )}
-        </>
+        </div>
       )}
 
       <textarea
+        row={3}
         placeholder="Write a caption..."
         value={caption}
         onChange={(e) => setCaption(e.target.value)}
+        className="w-full border border-border px-3 py-2 text-sm focus:border-fg focus:outline-none resize-none"
       />
 
-      <button onClick={handlePost}>Post</button>
+      <div className="flex items-center gap-4 text-sm">
+        <label className="flex items-center gap-1 cursor-pointer">
+          <input
+            type="radio"
+            name="visibility"
+            value="public"
+            checked={visibility === "public"}
+            onChange={() => setVisibility("public")}
+          />
+          <span>Public</span>
+        </label>
+
+        <label className="flex items-center gap-1 cursor-pointer">
+          <input
+            type="radio"
+            name="visibility"
+            value="private"
+            checked={visibility === "private"}
+            onChange={() => setVisibility("private")}
+          />
+          <span>Private</span>
+        </label>
+      </div>
+
+      <button
+        onClick={handlePost}
+        className="border border-fg bg-fg text-bg px-4 py-2 text-sm hover:bg-bg hover:text-fg transition"
+      >
+        Post
+      </button>
 
       <hr />
 
       <h3>Your Posts</h3>
 
-      {posts.map((p) => (
-        <div key={p.id} style={{ marginBottom: 20 }}>
-          {p.content_type === "video" ? (
-            <video src={p.media_url} controls width="300" />
-          ) : (
-            <img src={p.media_url} width="300" />
-          )}
-          <p>{p.caption}</p>
-        </div>
-      ))}
+      <div className="space-y-4">
+        {posts.map((p) => (
+          <div key={p.id} className="border border-border p-4 space-y-2">
+            {p.content_type === "video" ? (
+              <video src={p.media_url} controls className="w-full" />
+            ) : (
+              <img src={p.media_url} className="w-full" />
+            )}
+
+            <div className="flex items-center justify-between text-sm text-muted">
+              <p>{p.caption}</p>
+              <span className="uppercase text-xs border border-border px-2 py-0.5">
+                {p.visibility}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

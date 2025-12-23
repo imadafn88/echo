@@ -1,3 +1,9 @@
-:root {
-  background-color: #b2b2b2;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-bg text-fg font-sans;
+  }
 }
