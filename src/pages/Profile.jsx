@@ -102,7 +102,7 @@ export default function Profile({ session }) {
     <div className="max-w-xl mx-auto px-4 py-6 space-y-6">
       <>
         <Navbar />
-        <div className="max-w-xl mx-auto px-4 py-6 space-y-6">...</div>
+        {/* <div className="max-w-xl mx-auto px-4 py-6 space-y-6">...</div> */}
       </>
 
       {toast && (
